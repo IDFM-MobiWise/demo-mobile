@@ -22,8 +22,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.idfm.hackathon.ui.features.home.HomeScreen
+import com.idfm.hackathon.ui.features.home.HomeScreenViewModelImpl
 import com.idfm.hackathon.ui.nav.Screen
+import com.idfm.hackathon.ui.nav.WithTopBar
 import com.idfm.hackathon.ui.theme.HackathonIdFMTheme
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,9 +81,11 @@ class MainActivity : ComponentActivity() {
                                     fadeOut(animationSpec = tween(durationMillis = animDurations))
                         }
                     ) {
-
                         composable(route = Screen.Home.name) {
-                            HomeScreen(navController)
+                            val homeScreenViewModel = koinViewModel<HomeScreenViewModelImpl>()
+                            WithTopBar(currentScreen, navController, homeScreenViewModel) {
+                                HomeScreen(navController, homeScreenViewModel)
+                            }
                         }
                     }
                 }

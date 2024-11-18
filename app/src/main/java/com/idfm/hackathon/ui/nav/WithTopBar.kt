@@ -13,7 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
-import com.example.composeroom.ui.components.AppToolbar
+import com.idfm.hackathon.ui.components.AppToolbar
 
 @Composable
 fun WithTopBar(

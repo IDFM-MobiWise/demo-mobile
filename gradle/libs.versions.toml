@@ -12,6 +12,7 @@ navigationRuntimeKtx = "2.8.4"
 navigationCompose = "2.8.4"
 appcompat = "1.7.0"
 composeMaterial = "1.4.0"
+koin = "3.2.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +33,12 @@ androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navig
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterial" }
+
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref="koin"}
+koin-android = { group="io.insert-koin", name = "koin-android", version.ref="koin"}
+koin-android-compat = { group="io.insert-koin", name = "koin-android-compat", version.ref="koin"}
+koin-androidx-workmanager = { group="io.insert-koin", name = "koin-androidx-workmanager", version.ref="koin"}
+koin-androidx-compose = { group="io.insert-koin", name = "koin-androidx-compose", version.ref="koin"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

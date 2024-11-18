@@ -1,4 +1,5 @@
 package com.idfm.hackathon.ui.features.home
 
-interface HomeScreenViewModel: BaseViewModel() {
-}
+import com.idfm.hackathon.ui.nav.ToolbarController
+
+interface HomeScreenViewModel : ToolbarController

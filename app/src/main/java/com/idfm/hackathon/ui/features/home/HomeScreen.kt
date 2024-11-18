@@ -5,5 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun HomeScreen(navController: NavHostController = rememberNavController()) {
+fun HomeScreen(
+    @Suppress("unused_parameter")
+    navController: NavHostController = rememberNavController(),
+    vm: HomeScreenViewModel
+) {
+    // To be filled later.
 }

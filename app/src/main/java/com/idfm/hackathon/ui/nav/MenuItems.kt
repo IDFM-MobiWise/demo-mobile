@@ -2,7 +2,7 @@ package com.idfm.hackathon.ui.nav
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import com.example.composeroom.R
+import com.idfm.hackathon.R
 
 class MenuItems {
 
