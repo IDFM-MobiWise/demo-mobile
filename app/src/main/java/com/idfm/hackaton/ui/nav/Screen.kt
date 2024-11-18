@@ -1,0 +1,9 @@
+package com.idfm.hackaton.ui.nav
+
+import androidx.annotation.StringRes
+
+enum class Screen(val text: String = "", @StringRes val resId: Int = -1) {
+    Home("Home screen")
+
+    ;
+}
