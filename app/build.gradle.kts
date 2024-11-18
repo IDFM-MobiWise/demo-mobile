@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    namespace = "com.idfm.hackaton"
+    namespace = "com.idfm.hackathon"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.idfm.hackaton"
-        minSdk = 24
+        applicationId = "com.idfm.hackathon"
+        minSdk = 25
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.compose.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,4 +1,4 @@
-package com.idfm.hackaton.ui.nav
+package com.idfm.hackathon.ui.nav
 
 import androidx.annotation.StringRes
 

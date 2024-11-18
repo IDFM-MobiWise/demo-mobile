@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Hackaton IdFM</string>
+    <string name="app_name">Hackathon IdFM</string>
+    <string name="back_button">Back</string>
+    <string name="common_button_delete">Delete</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.idfm.hackaton
+package com.idfm.hackathon
 
 import org.junit.Test
 
