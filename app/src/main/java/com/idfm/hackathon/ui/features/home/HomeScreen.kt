@@ -87,7 +87,7 @@ fun HomeScreen(
                     when (line.line) {
                         "1" -> LineStatus.NORMAL
                         "2" -> LineStatus.INTERRUPTED
-                        "3" -> LineStatus.CLOSED
+                        "3a" -> LineStatus.CLOSED
                         else -> LineStatus.NORMAL
                     }
                 }) {

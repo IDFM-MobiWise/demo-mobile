@@ -35,7 +35,7 @@ fun TransportationTypeLineGrid(
 
     Box(modifier = Modifier.fillMaxWidth()) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(64.dp),
+            columns = GridCells.Adaptive(48.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier

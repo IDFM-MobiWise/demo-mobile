@@ -42,14 +42,13 @@ fun TransportationLineIcon(
         Box(
             modifier = Modifier
                 .aspectRatio(1f) // Ensures the box is square
-                .clip(RoundedCornerShape(14.dp)) // Rounded corners
+                .clip(RoundedCornerShape(8.dp)) // Rounded corners
                 .border(
                     lineStatus.thickness,
                     lineStatus.color,
                     RoundedCornerShape(14.dp)
                 ) // Outline border
                 .clickable { onClick(line) }
-                .padding(2.dp)
                 .then(modifier)
         ) {
             Image(
@@ -57,7 +56,7 @@ fun TransportationLineIcon(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(4.dp)
+                    .padding(8.dp)
                     .clickable {
                         onClick(line)
                     }
@@ -69,7 +68,8 @@ fun TransportationLineIcon(
                     contentDescription = "Status",
                     modifier = Modifier
                         .size(24.dp)
-                        .align(Alignment.BottomEnd),
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 8.dp),
                     tint = lineStatus.color,
                 )
             }
