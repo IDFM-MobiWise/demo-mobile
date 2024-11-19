@@ -1,10 +1,29 @@
 package com.idfm.hackathon.data.models
 
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.idfm.hackathon.R
+
 enum class TransportationType(val prefix: String) {
     METRO("metro_ligne_"),
     RER("rer_"),
     TRAM("tramway_t")
 }
+
+enum class LineStatus(
+    val color: Color,
+    val thickness: Dp,
+    @DrawableRes
+    val resId: Int
+) {
+    NORMAL(Color.Green, 2.dp, 0),
+    INTERRUPTED(Color(0xFFFFA500), 3.dp, R.drawable.ic_traffic_interrupted),
+    CLOSED(Color.Red, 4.dp, R.drawable.ic_traffic_closed)
+}
+
+
 enum class TransportationLine(val type: TransportationType, val line: String) {
     METRO_1(TransportationType.METRO, "1"),
     METRO_2(TransportationType.METRO, "2"),

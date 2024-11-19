@@ -12,12 +12,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.idfm.hackathon.data.models.LineStatus
 import com.idfm.hackathon.data.models.TransportationLine
 import com.idfm.hackathon.data.models.TransportationType
 
 
 @Composable
-fun TransportationTypeLineGrid(modifier: Modifier, type: TransportationType) {
+fun TransportationTypeLineGrid(
+    modifier: Modifier,
+    type: TransportationType,
+    statusForLine: (TransportationLine) -> LineStatus,
+    onClick: (TransportationLine) -> Unit
+) {
 
     val lines = remember {
         TransportationLine.entries.filter {
@@ -39,7 +45,12 @@ fun TransportationTypeLineGrid(modifier: Modifier, type: TransportationType) {
         ) {
 
             itemsIndexed(items = lines, key = { _, item -> item.line }) { _, line ->
-                TransportationLineIcon(line = line)
+                TransportationLineIcon(
+                    modifier = Modifier,
+                    line = line,
+                    lineStatus = statusForLine(line),
+                    onClick = onClick
+                )
             }
         }
     }
@@ -49,17 +60,26 @@ fun TransportationTypeLineGrid(modifier: Modifier, type: TransportationType) {
 @Preview
 @Composable
 fun TransportationTypeLineGridMetroPreview() {
-    TransportationTypeLineGrid(Modifier, TransportationType.METRO)
+    TransportationTypeLineGrid(modifier = Modifier,
+        type = TransportationType.METRO,
+        statusForLine = { _ -> LineStatus.NORMAL }
+    ) { _ -> }
 }
 
 @Preview
 @Composable
 fun TransportationTypeLineGridRerPreview() {
-    TransportationTypeLineGrid(Modifier, TransportationType.RER)
+    TransportationTypeLineGrid(modifier = Modifier,
+        type = TransportationType.RER,
+        statusForLine = { _ -> LineStatus.INTERRUPTED }
+    ) { _ -> }
 }
 
 @Preview
 @Composable
 fun TransportationTypeLineGridTramPreview() {
-    TransportationTypeLineGrid(Modifier, TransportationType.TRAM)
+    TransportationTypeLineGrid(modifier = Modifier,
+        type = TransportationType.TRAM,
+        statusForLine = { _ -> LineStatus.CLOSED }
+    ) { _ -> }
 }
