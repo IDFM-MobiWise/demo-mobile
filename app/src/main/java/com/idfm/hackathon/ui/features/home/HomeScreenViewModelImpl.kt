@@ -6,14 +6,12 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.idfm.hackathon.app.HackathonApp
 import com.idfm.hackathon.ui.BaseViewModel
 import com.idfm.hackathon.ui.nav.ActionMenuItem
 import com.idfm.hackathon.ui.nav.MenuItems
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 
 class HomeScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
@@ -55,6 +53,10 @@ class HomeScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
         speechRecognizer.stopListening()
     }
 
+    override fun fetchStuff() {
+        TODO("Not yet implemented")
+    }
+
     private fun menuItemStartStt(active: Boolean): ActionMenuItem {
         return MenuItems.menuMicOn(active)
     }
@@ -64,13 +66,13 @@ class HomeScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
     }
 
     private fun setupSpeechRecognizer() {
-        _uiState.value = HomeUiState.InitialisingStt
+        _uiState.value = HomeUiState.InProgress
         Log.d("HomeScreenViewModelImpl", "setupSpeechRecognizer called")
 
         speechRecognizer.setRecognitionListener(object : RecognitionListener {
             override fun onReadyForSpeech(params: Bundle?) {
                 setToolbarItems(listOf(menuItemStartStt(true)))
-                _uiState.value = HomeUiState.Listening(listOf(""))
+                _uiState.value = HomeUiState.ResultStt(listOf(""))
             }
 
             override fun onBeginningOfSpeech() {
@@ -100,24 +102,30 @@ class HomeScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
             }
 
             override fun onResults(results: Bundle?) {
-                setToolbarItems(listOf(menuItemStartStt(false)))
+                setToolbarItems(listOf(menuItemStopStt()))
                 val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 matches?.let {
                     // Nothing to do here, just tracing
                     Log.d("HomeScreenViewModelImpl", "onResults")
 
-                    val recognizedText = it[0]
-                    viewModelScope.launch {
-                        // Process the recognized text
-                    }
+//                    val recognizedText = it[0]
+//                    viewModelScope.launch {
+//                        // Process the recognized text
+//                    }
+
+                    _uiState.value = HomeUiState.ResultStt(it, false)
                 }
             }
 
             override fun onPartialResults(partialResults: Bundle?) {
-                val data = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
 
                 // Convert to list of results.
-                Log.d("HomeScreenViewModelImpl", "onPartialResults=${data}")
+                Log.d("HomeScreenViewModelImpl", "onPartialResults=${matches}")
+
+                matches?.let {
+                    _uiState.value = HomeUiState.ResultStt(matches, true)
+                }
             }
             override fun onEvent(eventType: Int, params: Bundle?) {
                 // Nothing to do here

@@ -5,9 +5,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 sealed class HomeUiState {
     data object Idle : HomeUiState()
-    data object InitialisingStt : HomeUiState()
-    data class Listening(val textList: List<String>) : HomeUiState()
-    data object ProcessingStt : HomeUiState()
+    data object InProgress : HomeUiState()
+    data class ResultStt(val textList: List<String>, val partial: Boolean = false) : HomeUiState()
     data class ErrorStt(val errorCode: Int) : HomeUiState()
 }
 
@@ -16,4 +15,5 @@ interface HomeScreenViewModel : ToolbarController {
     fun uiState(): StateFlow<HomeUiState>
     fun startStt()
     fun stopStt()
+    fun fetchStuff()
 }
