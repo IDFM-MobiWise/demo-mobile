@@ -1,8 +1,8 @@
-package com.idfm.hackathon.data.repositories
+package com.idfm.hackathon.data.repositories.sample
 
 import com.idfm.hackathon.data.models.SampleDto
+import com.idfm.hackathon.data.repositories.RepositoryResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import okio.IOException
 import retrofit2.HttpException
@@ -16,14 +16,17 @@ class SampleRepositoryImpl(private val sampleService: SampleService) : SampleRep
 //        TODO("Not yet implemented")
 //    }
 
-    override fun fetchData(): Flow<Result<SampleDto>> = flow {
+    override fun fetchData(): Flow<RepositoryResult<SampleDto>> = flow {
+
+        emit(RepositoryResult.Loading())
+
         try {
             val response = sampleService.fetchData()
-            emit(Result.success(response))
+            emit(RepositoryResult.Success(response))
         } catch (e: HttpException) {
-            emit(Result.failure<SampleDto>(e))
+            emit(RepositoryResult.Error(e))
         } catch (e: IOException) {
-            emit(Result.failure<SampleDto>(e))
+            emit(RepositoryResult.Error(e))
         }
     }
 

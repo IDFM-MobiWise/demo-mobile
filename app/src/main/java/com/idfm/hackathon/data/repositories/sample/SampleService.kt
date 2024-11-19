@@ -1,7 +1,6 @@
-package com.idfm.hackathon.data.repositories
+package com.idfm.hackathon.data.repositories.sample
 
 import com.idfm.hackathon.data.models.SampleDto
-import kotlinx.coroutines.flow.StateFlow
 import retrofit2.http.GET
 
 interface SampleService {

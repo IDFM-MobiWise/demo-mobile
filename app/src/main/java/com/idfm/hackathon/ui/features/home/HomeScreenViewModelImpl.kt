@@ -9,7 +9,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.idfm.hackathon.app.HackathonApp
 import com.idfm.hackathon.data.models.SampleDto
-import com.idfm.hackathon.data.repositories.SampleRepository
+import com.idfm.hackathon.data.repositories.sample.SampleRepository
 import com.idfm.hackathon.ui.BaseViewModel
 import com.idfm.hackathon.ui.nav.ActionMenuItem
 import com.idfm.hackathon.ui.nav.MenuItems
@@ -35,7 +35,6 @@ class HomeScreenViewModelImpl(private val _app: HackathonApp, private val sample
 
     init {
         setToolbarItems(listOf(menuItemStopStt()))
-        fetchData()
     }
 
     override fun onCleared() {
@@ -63,10 +62,10 @@ class HomeScreenViewModelImpl(private val _app: HackathonApp, private val sample
     }
 
     override fun fetchStuff() {
-        TODO("Not yet implemented")
+        fetchData()
     }
 
-    fun fetchData() {
+    private fun fetchData() {
         viewModelScope.launch {
             sampleRepo.fetchData().collect { result ->
                 // _data.value = result

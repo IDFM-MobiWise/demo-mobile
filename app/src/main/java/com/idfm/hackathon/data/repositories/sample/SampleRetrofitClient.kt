@@ -1,4 +1,4 @@
-package com.idfm.hackathon.data.repositories
+package com.idfm.hackathon.data.repositories.sample
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
