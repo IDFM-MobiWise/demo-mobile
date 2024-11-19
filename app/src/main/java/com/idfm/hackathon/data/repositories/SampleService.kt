@@ -2,8 +2,9 @@ package com.idfm.hackathon.data.repositories
 
 import com.idfm.hackathon.data.models.SampleDto
 import kotlinx.coroutines.flow.StateFlow
+import retrofit2.http.GET
 
-interface SampleLocalSource {
+interface SampleService {
     @GET("/data")
-    suspend fun getSampleData(): StateFlow<SampleDto>
+    suspend fun fetchData(): SampleDto
 }

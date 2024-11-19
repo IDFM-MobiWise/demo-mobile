@@ -6,15 +6,19 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.idfm.hackathon.app.HackathonApp
+import com.idfm.hackathon.data.models.SampleDto
+import com.idfm.hackathon.data.repositories.SampleRepository
 import com.idfm.hackathon.ui.BaseViewModel
 import com.idfm.hackathon.ui.nav.ActionMenuItem
 import com.idfm.hackathon.ui.nav.MenuItems
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 
-class HomeScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
+class HomeScreenViewModelImpl(private val _app: HackathonApp, private val sampleRepo: SampleRepository) : BaseViewModel(),
     HomeScreenViewModel {
     private val speechRecognizer: SpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(_app)
     private val recognizerIntent: Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -23,10 +27,15 @@ class HomeScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
         putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
     }
 
+    private val _sampleData = MutableStateFlow<Result<SampleDto>?>(null)
+    val sampleData: StateFlow<Result<SampleDto>?> = _sampleData
+
+
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Idle)
 
     init {
         setToolbarItems(listOf(menuItemStopStt()))
+        fetchData()
     }
 
     override fun onCleared() {
@@ -55,6 +64,15 @@ class HomeScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
 
     override fun fetchStuff() {
         TODO("Not yet implemented")
+    }
+
+    fun fetchData() {
+        viewModelScope.launch {
+            sampleRepo.fetchData().collect { result ->
+                // _data.value = result
+                Log.d("HomeScreenViewModelImpl", "fetchData result=${result}")
+            }
+        }
     }
 
     private fun menuItemStartStt(active: Boolean): ActionMenuItem {

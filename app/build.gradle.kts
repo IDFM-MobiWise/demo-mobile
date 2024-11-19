@@ -60,6 +60,11 @@ dependencies {
     implementation(libs.koin.androidx.workmanager)
     implementation(libs.koin.androidx.compose)
 
+    implementation(libs.retrofit)
+    implementation(libs.logging.interceptor)
+    implementation(libs.rxjava)
+    implementation(libs.gson.convertor) // "com.squareup.retrofit2:converter-gson:2.9.0"
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
