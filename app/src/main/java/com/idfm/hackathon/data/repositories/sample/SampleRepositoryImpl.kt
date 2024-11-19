@@ -8,13 +8,6 @@ import okio.IOException
 import retrofit2.HttpException
 
 class SampleRepositoryImpl(private val sampleService: SampleService) : SampleRepository {
-//    override fun state(): StateFlow<SampleRepositoryState> {
-//        TODO("Not yet implemented")
-//    }
-//
-//    override fun get() {
-//        TODO("Not yet implemented")
-//    }
 
     override fun fetchData(): Flow<RepositoryResult<SampleDto>> = flow {
 

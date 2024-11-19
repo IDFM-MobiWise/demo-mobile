@@ -9,16 +9,21 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.idfm.hackathon.app.HackathonApp
 import com.idfm.hackathon.data.models.SampleDto
+import com.idfm.hackathon.data.repositories.RepositoryResult
 import com.idfm.hackathon.data.repositories.sample.SampleRepository
 import com.idfm.hackathon.ui.BaseViewModel
 import com.idfm.hackathon.ui.nav.ActionMenuItem
 import com.idfm.hackathon.ui.nav.MenuItems
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 
 
-class HomeScreenViewModelImpl(private val _app: HackathonApp, private val sampleRepo: SampleRepository) : BaseViewModel(),
+class HomeScreenViewModelImpl(
+    private val _app: HackathonApp,
+    private val sampleRepo: SampleRepository
+) : BaseViewModel(),
     HomeScreenViewModel {
     private val speechRecognizer: SpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(_app)
     private val recognizerIntent: Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -68,7 +73,11 @@ class HomeScreenViewModelImpl(private val _app: HackathonApp, private val sample
     private fun fetchData() {
         viewModelScope.launch {
             sampleRepo.fetchData().collect { result ->
-                // _data.value = result
+                _uiState.value = if (result is RepositoryResult.Loading)
+                    HomeUiState.InProgress
+                else
+                    HomeUiState.Idle
+
                 Log.d("HomeScreenViewModelImpl", "fetchData result=${result}")
             }
         }
@@ -135,7 +144,8 @@ class HomeScreenViewModelImpl(private val _app: HackathonApp, private val sample
             }
 
             override fun onPartialResults(partialResults: Bundle?) {
-                val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                val matches =
+                    partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
 
                 // Convert to list of results.
                 Log.d("HomeScreenViewModelImpl", "onPartialResults=${matches}")
@@ -144,6 +154,7 @@ class HomeScreenViewModelImpl(private val _app: HackathonApp, private val sample
                     _uiState.value = HomeUiState.ResultStt(matches, true)
                 }
             }
+
             override fun onEvent(eventType: Int, params: Bundle?) {
                 // Nothing to do here
             }

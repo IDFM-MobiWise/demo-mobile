@@ -1,7 +1,7 @@
 package com.idfm.hackathon.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,6 +24,7 @@ import com.idfm.hackathon.data.models.LineStatus
 import com.idfm.hackathon.data.models.TransportationLine
 
 
+@SuppressLint("DiscouragedApi")
 @Composable
 fun TransportationLineIcon(
     modifier: Modifier = Modifier,
@@ -42,7 +43,11 @@ fun TransportationLineIcon(
             modifier = Modifier
                 .aspectRatio(1f) // Ensures the box is square
                 .clip(RoundedCornerShape(14.dp)) // Rounded corners
-                .border(lineStatus.thickness, lineStatus.color, RoundedCornerShape(14.dp)) // Outline border
+                .border(
+                    lineStatus.thickness,
+                    lineStatus.color,
+                    RoundedCornerShape(14.dp)
+                ) // Outline border
                 .clickable { onClick(line) }
                 .padding(2.dp)
                 .then(modifier)
@@ -50,7 +55,9 @@ fun TransportationLineIcon(
             Image(
                 painter = painterResource(id = resourceId),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize().padding(4.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(4.dp)
                     .clickable {
                         onClick(line)
                     }
@@ -60,7 +67,9 @@ fun TransportationLineIcon(
                 Icon(
                     painter = painterResource(id = lineStatus.resId),
                     contentDescription = "Status",
-                    modifier = Modifier.size(24.dp).align(Alignment.BottomEnd),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .align(Alignment.BottomEnd),
                     tint = lineStatus.color,
                 )
             }
@@ -71,8 +80,9 @@ fun TransportationLineIcon(
 @Preview
 @Composable
 fun TransportationLineIconPreview() {
-    TransportationLineIcon(modifier = Modifier,
+    TransportationLineIcon(
+        modifier = Modifier,
         line = TransportationLine.METRO_8,
         lineStatus = LineStatus.CLOSED,
-        ) { _ -> }
+    ) { _ -> }
 }

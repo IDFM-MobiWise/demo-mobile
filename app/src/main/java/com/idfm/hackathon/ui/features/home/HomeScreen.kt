@@ -25,6 +25,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.idfm.hackathon.data.models.LineStatus
 import com.idfm.hackathon.data.models.TransportationType
+import com.idfm.hackathon.ui.components.LoaderComponent
 import com.idfm.hackathon.ui.components.TransportationTypeLineGrid
 
 @Composable
@@ -109,9 +110,7 @@ fun HomeScreen(
 @Composable
 fun Loader(show: Boolean) {
     if (show) {
-        // Show loader
-    } else {
-        // Hide loader
+        LoaderComponent()
     }
 }
 
