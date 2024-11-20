@@ -3,6 +3,7 @@ package com.idfm.hackathon
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,7 +33,7 @@ import org.koin.androidx.compose.koinViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
+        enableEdgeToEdge()
         setContent {
             val animDurations = 500
             val screenOffset = 800
@@ -43,11 +45,11 @@ class MainActivity : ComponentActivity() {
             )
 
             HackathonIdFMTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(
                         navController = navController,
                         startDestination = Screen.Home.name,
-                        modifier = Modifier.padding(innerPadding),
+                        modifier = Modifier,
                         enterTransition = {
                             // called, if the navigation is about to show the composable
                             slideInHorizontally(
@@ -88,7 +90,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                }
+//                }
             }
         }
     }

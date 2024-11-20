@@ -45,11 +45,8 @@ fun WithTopBar(
             )
         }
     ) { innerPadding ->
-        Column(Modifier.background(Color.White)) {
-            Spacer(modifier = Modifier.padding(innerPadding))
-            Surface(Modifier.background(color = MaterialTheme.colorScheme.background)) {
-                content()
-            }
+        Surface(Modifier.background(color = MaterialTheme.colorScheme.background).padding(innerPadding)) {
+            content()
         }
 
     }

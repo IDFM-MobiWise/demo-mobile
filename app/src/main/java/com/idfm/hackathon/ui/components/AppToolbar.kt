@@ -1,6 +1,7 @@
 package com.idfm.hackathon.ui.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.border
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
