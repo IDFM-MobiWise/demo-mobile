@@ -12,9 +12,11 @@ import com.idfm.hackathon.data.models.SampleDto
 import com.idfm.hackathon.data.repositories.RepositoryResult
 import com.idfm.hackathon.data.repositories.sample.SampleRepository
 import com.idfm.hackathon.data.repositories.samplewebsocket.SampleWebsocketRepo
+import com.idfm.hackathon.data.repositories.samplewebsocket.WebSocketState
 import com.idfm.hackathon.ui.BaseViewModel
 import com.idfm.hackathon.ui.nav.ActionMenuItem
 import com.idfm.hackathon.ui.nav.MenuItems
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -41,6 +43,13 @@ class HomeScreenViewModelImpl(
 
     init {
         setToolbarItems(listOf(menuItemStopStt()))
+
+        CoroutineScope(viewModelScope.coroutineContext).launch {
+            _sampleWebsocketRepo.stateObserver().collect {
+                doHandleMessageFromWebsocket(it)
+
+            }
+        }
     }
 
     override fun onCleared() {
@@ -73,7 +82,7 @@ class HomeScreenViewModelImpl(
     }
 
     override fun sendToWebsocket(text: String) {
-        _sampleWebsocketRepo.sendText(text)
+        doSendToWebsocket(text)
     }
 
     private fun fetchData() {
@@ -175,5 +184,15 @@ class HomeScreenViewModelImpl(
         } else {
             _uiState.value = HomeUiState.ErrorStt(-1)
         }
+    }
+
+
+    private fun doSendToWebsocket(text: String) {
+        Log.d("HomeScreenViewModelImpl", "sending to websocket result=$text")
+        _sampleWebsocketRepo.sendText(text)
+    }
+
+    private fun doHandleMessageFromWebsocket(webSocketState: WebSocketState) {
+        Log.d("HomeScreenViewModelImpl", "Websocket message received in VM: $webSocketState")
     }
 }
