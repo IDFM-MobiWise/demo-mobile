@@ -11,8 +11,10 @@ import com.idfm.hackathon.app.HackathonApp
 import com.idfm.hackathon.data.models.SampleDto
 import com.idfm.hackathon.data.repositories.RepositoryResult
 import com.idfm.hackathon.data.repositories.sample.SampleRepository
-import com.idfm.hackathon.data.repositories.samplewebsocket.SampleWebsocketRepo
+import com.idfm.hackathon.data.repositories.samplewebsocket.FakeWebsocketRepoImpl
+import com.idfm.hackathon.data.repositories.samplewebsocket.SampleWebsocketRepoImpl
 import com.idfm.hackathon.data.repositories.samplewebsocket.WebSocketState
+import com.idfm.hackathon.data.repositories.samplewebsocket.WebsocketRepository
 import com.idfm.hackathon.ui.BaseViewModel
 import com.idfm.hackathon.ui.nav.ActionMenuItem
 import com.idfm.hackathon.ui.nav.MenuItems
@@ -37,7 +39,7 @@ class HomeScreenViewModelImpl(
     private val _sampleData = MutableStateFlow<Result<SampleDto>?>(null)
     val sampleData: StateFlow<Result<SampleDto>?> = _sampleData
 
-    private val _sampleWebsocketRepo: SampleWebsocketRepo = SampleWebsocketRepo()
+    private val _sampleWebsocketRepoImpl: WebsocketRepository = FakeWebsocketRepoImpl() // SampleWebsocketRepoImpl()
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Idle)
 
@@ -45,7 +47,7 @@ class HomeScreenViewModelImpl(
         setToolbarItems(listOf(menuItemStopStt()))
 
         CoroutineScope(viewModelScope.coroutineContext).launch {
-            _sampleWebsocketRepo.stateObserver().collect {
+            _sampleWebsocketRepoImpl.stateObserver().collect {
                 doHandleMessageFromWebsocket(it)
 
             }
@@ -55,7 +57,7 @@ class HomeScreenViewModelImpl(
     override fun onCleared() {
         super.onCleared()
         speechRecognizer.destroy()
-        _sampleWebsocketRepo.dispose()
+        _sampleWebsocketRepoImpl.dispose()
     }
 
     override fun uiState(): StateFlow<HomeUiState> {
@@ -189,7 +191,7 @@ class HomeScreenViewModelImpl(
 
     private fun doSendToWebsocket(text: String) {
         Log.d("HomeScreenViewModelImpl", "sending to websocket result=$text")
-        _sampleWebsocketRepo.sendText(text)
+        _sampleWebsocketRepoImpl.sendText(text)
     }
 
     private fun doHandleMessageFromWebsocket(webSocketState: WebSocketState) {
