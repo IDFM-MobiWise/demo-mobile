@@ -11,12 +11,12 @@ import com.idfm.hackathon.app.HackathonApp
 import com.idfm.hackathon.data.models.SampleDto
 import com.idfm.hackathon.data.repositories.RepositoryResult
 import com.idfm.hackathon.data.repositories.sample.SampleRepository
+import com.idfm.hackathon.data.repositories.samplewebsocket.SampleWebsocketRepo
 import com.idfm.hackathon.ui.BaseViewModel
 import com.idfm.hackathon.ui.nav.ActionMenuItem
 import com.idfm.hackathon.ui.nav.MenuItems
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 
 
@@ -35,6 +35,7 @@ class HomeScreenViewModelImpl(
     private val _sampleData = MutableStateFlow<Result<SampleDto>?>(null)
     val sampleData: StateFlow<Result<SampleDto>?> = _sampleData
 
+    private val _sampleWebsocketRepo: SampleWebsocketRepo = SampleWebsocketRepo()
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Idle)
 
@@ -45,6 +46,7 @@ class HomeScreenViewModelImpl(
     override fun onCleared() {
         super.onCleared()
         speechRecognizer.destroy()
+        _sampleWebsocketRepo.dispose()
     }
 
     override fun uiState(): StateFlow<HomeUiState> {
@@ -68,6 +70,10 @@ class HomeScreenViewModelImpl(
 
     override fun fetchStuff() {
         fetchData()
+    }
+
+    override fun sendToWebsocket(text: String) {
+        _sampleWebsocketRepo.sendText(text)
     }
 
     private fun fetchData() {

@@ -16,4 +16,5 @@ interface HomeScreenViewModel : ToolbarController {
     fun startStt()
     fun stopStt()
     fun fetchStuff()
+    fun sendToWebsocket(text: String)
 }

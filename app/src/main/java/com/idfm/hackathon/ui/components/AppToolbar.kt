@@ -1,7 +1,6 @@
 package com.idfm.hackathon.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.border
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
@@ -98,7 +97,8 @@ fun AppToolbar(
                                 searchExpandedScreenMap[currentScreen] = searchExp
                                 searchExpanded = searchExp
                                 toolbarController?.onSearchMenuExpanded(searchExp)
-                            }, onSearch = { textFieldValue ->
+                            },
+                            onSearch = { textFieldValue ->
                                 val exp = true
                                 searchExpandedScreenMap[currentScreen] = exp
                                 if (searchExpanded != exp) {

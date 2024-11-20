@@ -20,19 +20,15 @@ private val DarkColorScheme = darkColorScheme(
     )
 
 private val LightColorScheme = lightColorScheme(
-    primary = IdfMLightColor,
+    primary = IdfMDarkColor,
     secondary = IdfMBlue,
-    tertiary = IdfMDarkColor,
+    tertiary = IdfMLightColor,
+
+    onPrimary = IdfMLightColor,
 
     //Other default colors to override
     background = IdfMLightColor,
-//    surface = Color(0xFFFFFBFE),
-//    onPrimary = Color.White,
-//    onSecondary = Color.White,
-//    onTertiary = Color.White,
     onBackground = IdfMDarkColor,
-//    onSurface = Color(0xFF1C1B1F),
-//
 )
 
 @Composable

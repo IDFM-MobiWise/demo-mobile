@@ -65,6 +65,8 @@ dependencies {
     implementation(libs.rxjava)
     implementation(libs.gson.convertor) // "com.squareup.retrofit2:converter-gson:2.9.0"
 
+    implementation(libs.okhttp)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

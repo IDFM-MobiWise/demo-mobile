@@ -1,11 +1,11 @@
 package com.idfm.hackathon.ui.features.home
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -19,7 +19,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -27,6 +29,7 @@ import com.idfm.hackathon.data.models.LineStatus
 import com.idfm.hackathon.data.models.TransportationType
 import com.idfm.hackathon.ui.components.LoaderComponent
 import com.idfm.hackathon.ui.components.TransportationTypeLineGrid
+import com.idfm.hackathon.ui.theme.HackathonIdFMTheme
 
 @Composable
 fun HomeScreen(
@@ -46,7 +49,7 @@ fun HomeScreen(
     Box(modifier = Modifier.fillMaxSize()) {
 
         Column(
-            Modifier.fillMaxWidth(),
+            Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.Start
         ) {
             val context = LocalContext.current
@@ -101,6 +104,12 @@ fun HomeScreen(
             ) {
                 vm.fetchStuff()
             }
+
+            SendToWebsocketButton(
+                modifier = Modifier,
+                sttResults?.textList?.firstOrNull(),
+                vm
+            )
         }
 
         Loader(homeState is HomeUiState.InProgress)
@@ -131,7 +140,31 @@ fun ListeningProgression(data: HomeUiState.ResultStt?) {
 @Composable
 fun CallToAction(modifier: Modifier, onClick: () -> Unit = {}) {
     // Call to action
-    Button(modifier = modifier, onClick = onClick) {
+    Button(
+        modifier = Modifier.then(modifier), onClick = onClick
+    ) {
         Text("Call Yohann's Data")
     }
+}
+
+@Composable
+fun SendToWebsocketButton(modifier: Modifier, text: String?, vm: HomeScreenViewModel) {
+    // Call to action
+    Button(modifier = modifier, enabled = text?.isNotEmpty() == true,
+        onClick = {
+            text?.let {
+                // Send to websocket
+                vm.sendToWebsocket(it)
+            }
+        }) {
+        Text("Send to websocket")
+    }
+}
+
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true)
+@Composable
+fun CallToActionPreview() {
+    HackathonIdFMTheme { CallToAction(Modifier) }
 }
