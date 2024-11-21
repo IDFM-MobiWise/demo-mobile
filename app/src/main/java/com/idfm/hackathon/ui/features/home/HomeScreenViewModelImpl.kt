@@ -39,7 +39,7 @@ class HomeScreenViewModelImpl(
     private val _sampleData = MutableStateFlow<Result<SampleDto>?>(null)
     val sampleData: StateFlow<Result<SampleDto>?> = _sampleData
 
-    private val _sampleWebsocketRepoImpl: WebsocketRepository = FakeWebsocketRepoImpl() // SampleWebsocketRepoImpl()
+    private val _sampleWebsocketRepoImpl: WebsocketRepository = SampleWebsocketRepoImpl()
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Idle)
 

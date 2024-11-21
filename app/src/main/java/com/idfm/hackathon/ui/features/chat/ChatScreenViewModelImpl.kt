@@ -6,12 +6,20 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.idfm.hackathon.app.HackathonApp
+import com.idfm.hackathon.data.models.ChatMessage
+import com.idfm.hackathon.data.repositories.samplewebsocket.WebSocketState
+import com.idfm.hackathon.data.repositories.samplewebsocket.WebsocketRepository
 import com.idfm.hackathon.ui.BaseViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-class ChatScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
+class ChatScreenViewModelImpl(private val _app: HackathonApp,
+                              private val _sampleWebsocketRepo: WebsocketRepository
+) : BaseViewModel(),
     ChatScreenViewModel {
 
     private val speechRecognizer: SpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(_app)
@@ -22,6 +30,15 @@ class ChatScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
     }
 
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Idle)
+    private var _chatMessages = listOf<ChatMessage>()
+
+    init {
+        CoroutineScope(viewModelScope.coroutineContext).launch {
+            _sampleWebsocketRepo.stateObserver().collect {
+                doHandleMessageFromWebsocket(it)
+            }
+        }
+    }
 
     override fun uiState(): StateFlow<ChatUiState> {
         return _uiState
@@ -35,8 +52,12 @@ class ChatScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
         TODO("Not yet implemented")
     }
 
+    override fun postUSerRequest(request: String) {
+        _sampleWebsocketRepo.sendText(request)
+    }
+
     private fun setupSpeechRecognizer() {
-        _uiState.value = ChatUiState.InProgress
+        _uiState.value = ChatUiState.InProgress(_chatMessages)
         Log.d("ChatScreenViewModelImpl", "setupSpeechRecognizer called")
 
         speechRecognizer.setRecognitionListener(object : RecognitionListener {
@@ -106,6 +127,10 @@ class ChatScreenViewModelImpl(private val _app: HackathonApp) : BaseViewModel(),
         } else {
             _uiState.value = ChatUiState.ErrorStt(-1)
         }
+    }
+
+    private fun doHandleMessageFromWebsocket(webSocketState: WebSocketState) {
+        Log.d("HomeScreenViewModelImpl", "Websocket message received in VM: $webSocketState")
     }
 
 }
