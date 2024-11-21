@@ -9,20 +9,18 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.idfm.hackathon.ui.features.chat.ChatScreen
+import com.idfm.hackathon.ui.features.chat.ChatScreenViewModelImpl
 import com.idfm.hackathon.ui.features.home.HomeScreen
 import com.idfm.hackathon.ui.features.home.HomeScreenViewModelImpl
 import com.idfm.hackathon.ui.nav.Screen
@@ -46,50 +44,57 @@ class MainActivity : ComponentActivity() {
 
             HackathonIdFMTheme {
 //                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NavHost(
-                        navController = navController,
-                        startDestination = Screen.Home.name,
-                        modifier = Modifier,
-                        enterTransition = {
-                            // called, if the navigation is about to show the composable
-                            slideInHorizontally(
-                                initialOffsetX = { screenOffset },
-                                animationSpec = tween(animDurations)
-                            ) +
-                                    fadeIn(animationSpec = tween(durationMillis = animDurations))
-                        },
-                        popEnterTransition = {
-                            // called for the new composable, if the current one is about to be removed
-                            slideInHorizontally(
-                                initialOffsetX = { -screenOffset },
-                                animationSpec = tween(animDurations)
-                            ) +
-                                    fadeIn(animationSpec = tween(durationMillis = animDurations))
-                        },
-                        exitTransition = {
-                            // called, if the navigation is removing the current composable
-                            slideOutHorizontally(
-                                targetOffsetX = { -screenOffset },
-                                animationSpec = tween(animDurations)
-                            ) +
-                                    fadeOut(animationSpec = tween(durationMillis = animDurations))
-                        },
-                        popExitTransition = {
-                            // called for the old composable, if the new one is about to be shown
-                            slideOutHorizontally(
-                                targetOffsetX = { screenOffset },
-                                animationSpec = tween(animDurations)
-                            ) +
-                                    fadeOut(animationSpec = tween(durationMillis = animDurations))
-                        }
-                    ) {
-                        composable(route = Screen.Home.name) {
-                            val homeScreenViewModel = koinViewModel<HomeScreenViewModelImpl>()
-                            WithTopBar(currentScreen, navController, homeScreenViewModel) {
-                                HomeScreen(navController, homeScreenViewModel)
-                            }
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.Home.name,
+                    modifier = Modifier,
+                    enterTransition = {
+                        // called, if the navigation is about to show the composable
+                        slideInHorizontally(
+                            initialOffsetX = { screenOffset },
+                            animationSpec = tween(animDurations)
+                        ) +
+                                fadeIn(animationSpec = tween(durationMillis = animDurations))
+                    },
+                    popEnterTransition = {
+                        // called for the new composable, if the current one is about to be removed
+                        slideInHorizontally(
+                            initialOffsetX = { -screenOffset },
+                            animationSpec = tween(animDurations)
+                        ) +
+                                fadeIn(animationSpec = tween(durationMillis = animDurations))
+                    },
+                    exitTransition = {
+                        // called, if the navigation is removing the current composable
+                        slideOutHorizontally(
+                            targetOffsetX = { -screenOffset },
+                            animationSpec = tween(animDurations)
+                        ) +
+                                fadeOut(animationSpec = tween(durationMillis = animDurations))
+                    },
+                    popExitTransition = {
+                        // called for the old composable, if the new one is about to be shown
+                        slideOutHorizontally(
+                            targetOffsetX = { screenOffset },
+                            animationSpec = tween(animDurations)
+                        ) +
+                                fadeOut(animationSpec = tween(durationMillis = animDurations))
+                    }
+                ) {
+                    composable(route = Screen.Home.name) {
+                        val homeScreenViewModel = koinViewModel<HomeScreenViewModelImpl>()
+                        WithTopBar(currentScreen, navController, homeScreenViewModel) {
+                            HomeScreen(navController, homeScreenViewModel)
                         }
                     }
+
+                    composable(route = Screen.Chat.name) {
+                        val chatScreenViewModel = koinViewModel<ChatScreenViewModelImpl>()
+                        WithTopBar(currentScreen, navController, chatScreenViewModel) {
+                            ChatScreen(navController, chatScreenViewModel)
+                        }
+                    }
+                }
 //                }
             }
         }

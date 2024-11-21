@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import com.idfm.hackathon.data.models.LineStatus
 import com.idfm.hackathon.data.models.TransportationType
 import com.idfm.hackathon.ui.components.LoaderComponent
+import com.idfm.hackathon.ui.components.MapViewComponent
 import com.idfm.hackathon.ui.components.TransportationTypeLineGrid
 import com.idfm.hackathon.ui.theme.HackathonIdFMTheme
 
@@ -55,6 +57,10 @@ fun HomeScreen(
             val context = LocalContext.current
 
             ListeningProgression(sttResults)
+
+//            Box(Modifier.height(200.dp)) {
+//                MapViewComponent(Modifier.fillMaxSize())
+//            }
 
             TransportationTypeLineGrid(modifier = Modifier,
                 type = TransportationType.METRO,
@@ -110,6 +116,10 @@ fun HomeScreen(
                 sttResults?.textList?.firstOrNull(),
                 vm
             )
+
+            OpenChat(modifier = Modifier) {
+                navController.navigate("chat")
+            }
         }
 
         Loader(homeState is HomeUiState.InProgress)
@@ -158,6 +168,15 @@ fun SendToWebsocketButton(modifier: Modifier, text: String?, vm: HomeScreenViewM
             }
         }) {
         Text("Send to websocket")
+    }
+}
+
+@Composable
+fun OpenChat(modifier: Modifier, onClick: () -> Unit) {
+    Button(modifier = modifier,
+        onClick = onClick
+    ) {
+        Text("Open chat")
     }
 }
 

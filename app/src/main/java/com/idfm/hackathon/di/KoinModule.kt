@@ -4,6 +4,7 @@ import com.idfm.hackathon.app.HackathonApp
 import com.idfm.hackathon.data.repositories.sample.SampleRepository
 import com.idfm.hackathon.data.repositories.sample.SampleRepositoryImpl
 import com.idfm.hackathon.data.repositories.sample.SampleRetrofitClient
+import com.idfm.hackathon.ui.features.chat.ChatScreenViewModelImpl
 import com.idfm.hackathon.ui.features.home.HomeScreenViewModel
 import com.idfm.hackathon.ui.features.home.HomeScreenViewModelImpl
 import org.koin.android.ext.koin.androidApplication
@@ -16,6 +17,10 @@ val diModules = module {
     viewModel {
         HomeScreenViewModelImpl(androidApplication() as HackathonApp, get())
     } bind HomeScreenViewModel::class
+
+    viewModel {
+        ChatScreenViewModelImpl(androidApplication() as HackathonApp)
+    }
 
     factory {
         SampleRepositoryImpl(SampleRetrofitClient.apiService)
