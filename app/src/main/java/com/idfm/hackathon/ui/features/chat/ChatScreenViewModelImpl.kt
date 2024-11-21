@@ -7,8 +7,12 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.idfm.hackathon.app.HackathonApp
 import com.idfm.hackathon.data.models.ChatMessage
+import com.idfm.hackathon.data.models.JsonResponse
+import com.idfm.hackathon.data.repositories.samplewebsocket.ReceivedType
 import com.idfm.hackathon.data.repositories.samplewebsocket.WebSocketState
 import com.idfm.hackathon.data.repositories.samplewebsocket.WebsocketRepository
 import com.idfm.hackathon.ui.BaseViewModel
@@ -17,8 +21,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ChatScreenViewModelImpl(private val _app: HackathonApp,
-                              private val _sampleWebsocketRepo: WebsocketRepository
+class ChatScreenViewModelImpl(
+    private val _app: HackathonApp,
+    private val _sampleWebsocketRepo: WebsocketRepository
 ) : BaseViewModel(),
     ChatScreenViewModel {
 
@@ -29,8 +34,11 @@ class ChatScreenViewModelImpl(private val _app: HackathonApp,
         putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
     }
 
-    private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Idle)
-    private var _chatMessages = listOf<ChatMessage>()
+    private var _chatMessages = listOf<ChatMessage>(
+        ChatMessage.FromBot(listOf("Hello, how can I help you?"), listOf())
+    )
+
+    private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Idle(_chatMessages))
 
     init {
         CoroutineScope(viewModelScope.coroutineContext).launch {
@@ -54,6 +62,12 @@ class ChatScreenViewModelImpl(private val _app: HackathonApp,
 
     override fun postUSerRequest(request: String) {
         _sampleWebsocketRepo.sendText(request)
+
+        val tmp = _chatMessages.map { it }.toMutableList()
+        tmp.add(ChatMessage.FromUser(request))
+
+        _chatMessages = tmp.toList()
+        _uiState.value = ChatUiState.Response(_chatMessages)
     }
 
     private fun setupSpeechRecognizer() {
@@ -62,7 +76,7 @@ class ChatScreenViewModelImpl(private val _app: HackathonApp,
 
         speechRecognizer.setRecognitionListener(object : RecognitionListener {
             override fun onReadyForSpeech(params: Bundle?) {
-                _uiState.value = ChatUiState.ResultStt(listOf(""))
+                _uiState.value = ChatUiState.ResultStt(_chatMessages, listOf(""))
             }
 
             override fun onBeginningOfSpeech() {
@@ -87,7 +101,7 @@ class ChatScreenViewModelImpl(private val _app: HackathonApp,
 
             override fun onError(error: Int) {
                 Log.d("ChatScreenViewModelImpl", "onError")
-                _uiState.value = ChatUiState.ErrorStt(error)
+                _uiState.value = ChatUiState.ErrorStt(_chatMessages, error)
             }
 
             override fun onResults(results: Bundle?) {
@@ -97,7 +111,7 @@ class ChatScreenViewModelImpl(private val _app: HackathonApp,
                     Log.d("ChatScreenViewModelImpl", "onResults")
 
 
-                    _uiState.value = ChatUiState.ResultStt(it, false)
+                    _uiState.value = ChatUiState.ResultStt(_chatMessages, it, false)
                 }
             }
 
@@ -109,7 +123,7 @@ class ChatScreenViewModelImpl(private val _app: HackathonApp,
                 Log.d("ChatScreenViewModelImpl", "onPartialResults=${matches}")
 
                 matches?.let {
-                    _uiState.value = ChatUiState.ResultStt(matches, true)
+                    _uiState.value = ChatUiState.ResultStt(_chatMessages, matches, true)
                 }
             }
 
@@ -125,12 +139,66 @@ class ChatScreenViewModelImpl(private val _app: HackathonApp,
         if (SpeechRecognizer.isRecognitionAvailable(_app)) {
             speechRecognizer.startListening(recognizerIntent)
         } else {
-            _uiState.value = ChatUiState.ErrorStt(-1)
+            _uiState.value = ChatUiState.ErrorStt(_chatMessages, -1)
         }
     }
 
     private fun doHandleMessageFromWebsocket(webSocketState: WebSocketState) {
         Log.d("HomeScreenViewModelImpl", "Websocket message received in VM: $webSocketState")
+
+        when (webSocketState) {
+            is WebSocketState.Open -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket open")
+            }
+
+            is WebSocketState.OnMessage -> {
+                Log.d(
+                    "HomeScreenViewModelImpl",
+                    "Websocket message: ${webSocketState.receivedType}"
+                )
+                if (webSocketState.receivedType is ReceivedType.Text) {
+                    val txt = webSocketState.receivedType.text
+
+                    // Now, deserialize.
+                    val gson = Gson()
+                    val responseType = object : TypeToken<JsonResponse>() {}.type
+                    val response = gson.fromJson<JsonResponse>(txt, responseType)
+
+                    if (response.node == "respond") {
+                        val msg =
+                            response.values.messages.getOrNull(0)?.kwargs?.lc_kwargs?.lc_kwargs?.content
+
+                        if (msg != null) {
+                            val tmp = _chatMessages.map { it }.toMutableList()
+                            tmp.add(
+                                ChatMessage.FromBot(
+                                    responseChunks = listOf(msg),
+                                    options = listOf()
+                                )
+                            )
+                            _chatMessages = tmp.toList()
+                            _uiState.value = ChatUiState.Response(_chatMessages)
+                        }
+                    }
+                }
+            }
+
+            is WebSocketState.Closing -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket closing")
+            }
+
+            is WebSocketState.Closed -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket closed")
+            }
+
+            is WebSocketState.Failure -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket failure: ${webSocketState.t}")
+            }
+
+            else -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket unknown state")
+            }
+        }
     }
 
 }

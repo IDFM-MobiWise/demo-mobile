@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -37,16 +40,16 @@ fun ChatScreen(
     vm: ChatScreenViewModel
 ) {
     val chatState by vm.uiState().collectAsState()
-    var chatResults by remember {
-        mutableStateOf(ChatUiState.Response(emptyList()))
-    }
+//    var chatResults by remember {
+//        mutableStateOf(ChatUiState.Response(emptyList()))
+//    }
 
-    if (chatState is ChatUiState.Response) {
-        chatResults = chatState as ChatUiState.Response
-    }
+//    if (chatState is ChatUiState.Response) {
+//        chatResults = chatState as ChatUiState.Response
+//    }
 
     Column(Modifier.fillMaxSize()) {
-        ChatMessageList(Modifier, chatResults.responses)
+        ChatMessageList(Modifier, chatState.messages)
 
         UserInput {
             vm.postUSerRequest(it)
@@ -95,7 +98,10 @@ fun UserInput(onSend: (String) -> Unit = {}) {
         Button(onClick = {
             onSend(userInput)
         }, enabled = userInput.isNotBlank()) {
-            Text("Send")
+            Icon(
+                imageVector = Icons.Default.Send,
+                contentDescription = "Send"
+            )
         }
     }
 }
@@ -137,7 +143,7 @@ fun ChatMessageFromUser(modifier: Modifier, message: ChatMessage.FromUser) {
             .then(modifier)
     ) {
         Column(modifier = Modifier.align(Alignment.CenterEnd)) {
-            Text(message.request, modifier = Modifier.widthIn(120.dp))
+            Text(message.message, modifier = Modifier.widthIn(120.dp))
         }
     }
 }

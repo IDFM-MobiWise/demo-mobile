@@ -7,11 +7,15 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.idfm.hackathon.app.HackathonApp
+import com.idfm.hackathon.data.models.JsonResponse
 import com.idfm.hackathon.data.models.SampleDto
 import com.idfm.hackathon.data.repositories.RepositoryResult
 import com.idfm.hackathon.data.repositories.sample.SampleRepository
 import com.idfm.hackathon.data.repositories.samplewebsocket.FakeWebsocketRepoImpl
+import com.idfm.hackathon.data.repositories.samplewebsocket.ReceivedType
 import com.idfm.hackathon.data.repositories.samplewebsocket.SampleWebsocketRepoImpl
 import com.idfm.hackathon.data.repositories.samplewebsocket.WebSocketState
 import com.idfm.hackathon.data.repositories.samplewebsocket.WebsocketRepository
@@ -196,5 +200,40 @@ class HomeScreenViewModelImpl(
 
     private fun doHandleMessageFromWebsocket(webSocketState: WebSocketState) {
         Log.d("HomeScreenViewModelImpl", "Websocket message received in VM: $webSocketState")
+
+        when (webSocketState) {
+            is WebSocketState.Open -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket open")
+            }
+            is WebSocketState.OnMessage -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket message: ${webSocketState.receivedType}")
+                if (webSocketState.receivedType is ReceivedType.Text) {
+                    val txt = webSocketState.receivedType.text
+
+                    // Now, deserialize.
+                    val gson = Gson()
+                    val responseType = object : TypeToken<JsonResponse>() {}.type
+                    val response = gson.fromJson<JsonResponse>(txt, responseType)
+
+                    if (response.node == "respond") {
+                        val msg = response.values.messages.getOrNull(0)?.kwargs?.lc_kwargs?.lc_kwargs?.content
+
+                    }
+
+                }
+            }
+            is WebSocketState.Closing -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket closing")
+            }
+            is WebSocketState.Closed -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket closed")
+            }
+            is WebSocketState.Failure -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket failure: ${webSocketState.t}")
+            }
+            else -> {
+                Log.d("HomeScreenViewModelImpl", "Websocket unknown state")
+            }
+        }
     }
 }
