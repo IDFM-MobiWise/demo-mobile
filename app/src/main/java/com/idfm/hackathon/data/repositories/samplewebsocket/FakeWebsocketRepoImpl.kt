@@ -24,8 +24,8 @@ class FakeWebsocketRepoImpl() : WebsocketRepository {
 //                WebSocketState.Open,
                 WebSocketState.OnMessage(ReceivedType.Text(
                     FakeResponse(
-                        content = "ok, pour prendre le TGV à la Gare de Lyon à 17:04, et arriver arriver avec 20 minutes d'avance, " +
-                                "il faut partir de la Montparnasse à 16:28. Le traffic est actuellement fluide, et la l'affluence habituelle. ",
+                        content = "Ok, pour prendre le TGV à la Gare de Lyon à 17:04, et arriver arriver avec 20 minutes d'avance, " +
+                                "il faut partir de la gare Montparnasse à 16:28. Le traffic est actuellement fluide, et l'affluence habituelle. ",
                         listOf(TransportationLine.METRO_4, TransportationLine.METRO_14),
                         journeyFromDate = "16:28",
                         journeyToDate = "16:44",
