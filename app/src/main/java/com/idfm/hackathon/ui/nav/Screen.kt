@@ -4,6 +4,6 @@ import androidx.annotation.StringRes
 
 enum class Screen(val text: String = "", @StringRes val resId: Int = -1) {
     Home("Home screen"),
-    Chat("Chat screen")
+    Chat("IDFM Copilote")
     ;
 }

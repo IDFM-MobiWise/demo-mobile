@@ -63,7 +63,8 @@ import java.util.Date
 
 object Variables {
     val ColorsAccentMain: Color = Color(0xFF1976D3)
-    val ColorsAccentOther: Color = Color(0xFF0050AA)
+    val ColorsAccentDark: Color = Color(0xFF0050AA)
+    val ColorsAccentGreen: Color = Color(0xFF118953)
     val cornerRadius = 8.dp
 }
 
@@ -310,33 +311,40 @@ fun DisplayChatMessageFromUser(modifier: Modifier, message: ChatMessageFromUser)
 @Composable
 fun Journey(message: ChatMessageFromBot) {
     if (message.transportationLines.isNotEmpty()) {
+        Column {
+            Row(modifier = Modifier.padding(8.dp)) {
+                Column(Modifier.weight(1.0f)) {
+                    Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
+                        message.transportationLines.forEachIndexed { index, it ->
+                            TransportationLineIcon(
+                                Modifier.size(40.dp),
+                                it,
+                                LineStatus.NONE
+                            ) {
 
-        Row(modifier = Modifier.padding(8.dp)) {
-            Column(Modifier.weight(1.0f)) {
-                Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
-                    message.transportationLines.forEachIndexed { index, it ->
-                        TransportationLineIcon(
-                            Modifier.size(40.dp),
-                            it,
-                            LineStatus.NONE
-                        ) {
+                            }
 
-                        }
-
-                        if (index < message.transportationLines.size - 1) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_arrow_right),
-                                contentDescription = "Send"
-                            )
+                            if (index < message.transportationLines.size - 1) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_arrow_right),
+                                    contentDescription = "Send"
+                                )
+                            }
                         }
                     }
+                    JourneyHours(message.journeyFrom, message.journeyTo)
                 }
-                JourneyHours(message.journeyFrom, message.journeyTo)
+
+                AdditionalJourneyDetails(
+                    Modifier
+                        .padding(end = 8.dp)
+                        .fillMaxHeight(),
+                    message.remainingTime,
+                    message.co2
+                )
             }
 
-            AdditionalJourneyDetails(Modifier.padding(end = 8.dp).fillMaxHeight(),
-                message.remainingTime,
-                message.co2)
+            JourneyHint(modifier = Modifier, message)
         }
     }
 }
@@ -368,22 +376,79 @@ fun JourneyHours(from: String, to: String) {
 fun AdditionalJourneyDetails(modifier: Modifier, remaining: String, co2: String) {
     Column(horizontalAlignment = Alignment.End, modifier = Modifier.then(modifier)) {
         Box(Modifier.clip(RoundedCornerShape(Variables.cornerRadius))) {
-            Text(text = "2.35€",
+            Text(
+                text = "2.35€",
                 color = Color.White,
-                modifier = Modifier.background(Variables.ColorsAccentOther)
-                    .padding(top = 4.dp, bottom = 4.dp, start = 6.dp, end = 6.dp))
+                modifier = Modifier
+                    .background(Variables.ColorsAccentDark)
+                    .padding(top = 4.dp, bottom = 4.dp, start = 6.dp, end = 6.dp)
+            )
         }
-        Text(text = remaining,
+        Text(
+            text = remaining,
             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
             fontSize = 16.sp,
-            color = Color.Black)
+            color = Color.Black
+        )
 
-        Text(text = co2,
-            modifier= Modifier.alpha(0.5f),
+        Text(
+            text = co2,
+            modifier = Modifier.alpha(0.5f),
             fontSize = 16.sp,
-            color = Color.Black)
+            color = Color.Black
+        )
 
     }
+}
+
+@Composable
+fun JourneyHint(modifier: Modifier, message: ChatMessageFromBot) {
+    val type = message.type.first
+    val backgroundColor = if (type) {
+        Variables.ColorsAccentGreen
+    } else {
+        Variables.ColorsAccentDark
+    }
+
+    val icon = if (type) {
+        R.drawable.ic_tick
+    } else {
+        R.drawable.ic_sparkles
+    }
+
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .background(backgroundColor)) {
+        Row(modifier = Modifier.padding(start = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(id = icon),
+                contentDescription = "Icon from assets",
+                modifier = Modifier.padding(8.dp)
+            )
+            Text(message.type.second, color = Color.White)
+        }
+    }
+}
+
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+fun JourneyHintPreview() {
+    JourneyHint(
+        Modifier, ChatMessageFromBot(
+            42,
+            Date(),
+            listOf(),
+            listOf(),
+            listOf(),
+            "",
+            "",
+            "",
+            "",
+            Pair(true, "Journey is ok")
+        )
+    )
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -413,6 +478,9 @@ fun DisplayChatMessageFromBotPreview() {
             options = listOf("Good", "Bad"),
             journeyFrom = "",
             journeyTo = "",
+            remainingTime = "",
+            co2 = "",
+            type = Pair(true, "Journey is ok")
         ),
         onOptionSelected = {}
     )
@@ -453,7 +521,10 @@ fun ChatMessageListPreview() {
                 TransportationLine.METRO_4, TransportationLine.METRO_1
             ),
             journeyFrom = "14:32",
-            journeyTo = "15:27"
+            journeyTo = "15:27",
+            remainingTime = "17 min",
+            co2 = "15 gr (CO2)",
+            type = Pair(true, "Journey is ok")
         ),
         ChatMessageFromUser(43, Date(), "Hello")
     )

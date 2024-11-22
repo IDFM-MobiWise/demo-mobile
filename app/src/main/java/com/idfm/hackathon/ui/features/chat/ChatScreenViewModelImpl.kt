@@ -30,7 +30,8 @@ class FakeResponse(
     val journeyFromDate: String = "",
     val journeyToDate: String = "",
     val remainingTime: String = "",
-    val co2: String = ""
+    val co2: String = "",
+    val type: Pair<Boolean, String>
 )
 
 class ChatScreenViewModelImpl(
@@ -53,6 +54,7 @@ class ChatScreenViewModelImpl(
             Date(),
             listOf("Bonjour, comment puis-je t'aider aujourd'hui ?"),
             listOf(),
+            type = Pair(true, "")
         ),
 //        ChatMessageFromUser(uid++, Date(), "Je vais à la piscine")
     )
@@ -196,7 +198,8 @@ class ChatScreenViewModelImpl(
                                 journeyFrom = response.journeyFromDate,
                                 journeyTo = response.journeyToDate,
                                 remainingTime = response.remainingTime,
-                                co2 = response.co2
+                                co2 = response.co2,
+                                type = response.type
                             )
                         )
                         _chatMessages = tmp.toList()

@@ -58,5 +58,6 @@ class ChatMessageFromBot(
     val journeyFrom: String = "",
     val journeyTo: String = "",
     val remainingTime: String = "",
-    val co2: String = ""
+    val co2: String = "",
+    val type: Pair<Boolean, String>
 ) : ChatMessage(id, timeStamp)

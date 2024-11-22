@@ -30,7 +30,8 @@ class FakeWebsocketRepoImpl() : WebsocketRepository {
                         journeyFromDate = "16:28",
                         journeyToDate = "16:44",
                         remainingTime = "16 min",
-                        co2 = "15 gr (CO2)"
+                        co2 = "15 gr (CO2)",
+                        type = Pair(true, "Trajet fluide")
 
                     ).let {
                         Gson().toJson(it)
@@ -45,7 +46,8 @@ class FakeWebsocketRepoImpl() : WebsocketRepository {
                         journeyFromDate = "16:37",
                         journeyToDate = "16:49",
                         remainingTime = "12 min",
-                        co2 = "8 gr (CO2)"
+                        co2 = "8 gr (CO2)",
+                        type = Pair(false, "Nouveau trajet optimisé")
                     ).let {
                         Gson().toJson(it)
                     }
