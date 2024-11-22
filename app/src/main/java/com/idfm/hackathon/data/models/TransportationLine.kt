@@ -20,7 +20,8 @@ enum class LineStatus(
 ) {
     NORMAL(Color.Green, 2.dp, 0),
     INTERRUPTED(Color(0xFFFFA500), 3.dp, R.drawable.ic_traffic_interrupted),
-    CLOSED(Color.Red, 4.dp, R.drawable.ic_traffic_closed)
+    CLOSED(Color.Red, 4.dp, R.drawable.ic_traffic_closed),
+    NONE(Color.Transparent, 0.dp, 0   )
 }
 
 

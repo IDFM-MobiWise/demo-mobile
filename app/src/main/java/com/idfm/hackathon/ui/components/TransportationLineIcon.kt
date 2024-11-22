@@ -62,7 +62,7 @@ fun TransportationLineIcon(
                     }
                     .then(modifier))
 
-            if (lineStatus != LineStatus.NORMAL) {
+            if ((lineStatus != LineStatus.NORMAL) && (lineStatus != LineStatus.NONE)) {
                 Icon(
                     painter = painterResource(id = lineStatus.resId),
                     contentDescription = "Status",

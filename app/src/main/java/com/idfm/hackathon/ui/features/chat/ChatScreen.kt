@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -50,6 +52,9 @@ import com.idfm.hackathon.R
 import com.idfm.hackathon.data.models.ChatMessage
 import com.idfm.hackathon.data.models.ChatMessageFromBot
 import com.idfm.hackathon.data.models.ChatMessageFromUser
+import com.idfm.hackathon.data.models.LineStatus
+import com.idfm.hackathon.data.models.TransportationLine
+import com.idfm.hackathon.ui.components.TransportationLineIcon
 import com.idfm.hackathon.utils.toTime
 import java.util.Date
 
@@ -69,9 +74,11 @@ fun ChatScreen(
     Column(Modifier.fillMaxSize()) {
         ChatMessageList(Modifier.weight(1.0f), chatState.messages)
 
-        UserInput {
+        UserInput(onSend = {
             vm.postUSerRequest(it)
-        }
+        }, onStt = {
+            vm.startStt()
+        })
     }
 }
 
@@ -106,7 +113,7 @@ fun ChatMessageList(modifier: Modifier, messages: List<ChatMessage>) {
 }
 
 @Composable
-fun UserInput(onSend: (String) -> Unit = {}) {
+fun UserInput(onSend: (String) -> Unit = {}, onStt: () -> Unit) {
     val context = LocalContext.current
     Row(Modifier.fillMaxWidth()) {
         var userInput by remember { mutableStateOf("") }
@@ -123,6 +130,15 @@ fun UserInput(onSend: (String) -> Unit = {}) {
                 contentDescription = "Send"
             )
         }
+
+        Button(onClick = {
+            onStt()
+        }, enabled = userInput.isNotBlank()) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_mic_on_active),
+                contentDescription = "Stt"
+            )
+        }
     }
 }
 
@@ -133,15 +149,22 @@ fun DisplayChatMessageFromBot(
     onOptionSelected: (String) -> Unit
 ) {
     Column(Modifier.padding(16.dp)) {
-        Row(modifier.fillMaxWidth().padding(bottom = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier
+                .fillMaxWidth()
+                .padding(bottom = 2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_surprise),
                 contentDescription = "Icon from assets"
             )
 
-            Text(text = "Livechat ${message.timeStamp.toTime()}",
+            Text(
+                text = "Livechat ${message.timeStamp.toTime()}",
                 modifier = modifier.padding(start = 16.dp),
-                fontSize = 10.sp)
+                fontSize = 10.sp
+            )
         }
 
         Box(Modifier.fillMaxWidth()) {
@@ -152,7 +175,10 @@ fun DisplayChatMessageFromBot(
                         color = Variables.ColorsAccentMain,
                         shape = RoundedCornerShape(size = Variables.cornerRadius)
                     )
-                    .background(color = Color(0xFFFFFFFF), shape = RoundedCornerShape(size = Variables.cornerRadius))
+                    .background(
+                        color = Color(0xFFFFFFFF),
+                        shape = RoundedCornerShape(size = Variables.cornerRadius)
+                    )
                     .padding(start = 20.dp, top = 20.dp, end = 20.dp, bottom = 20.dp)
                     .widthIn(120.dp)
                     .then(modifier)
@@ -161,16 +187,23 @@ fun DisplayChatMessageFromBot(
                     val fullText = message.responseChunks.joinToString(" ")
                     Text(fullText)
 
-                    Row(modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly) {
+                    Row(
+                        modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
                         message.options.forEach {
-                            Button(onClick = {
-                                onOptionSelected(it)
-                            }, colors = ButtonDefaults.buttonColors(containerColor = Variables.ColorsAccentMain)) {
+                            Button(
+                                onClick = {
+                                    onOptionSelected(it)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Variables.ColorsAccentMain)
+                            ) {
                                 Text(it, fontSize = 12.sp)
                             }
                         }
                     }
+
+                    Journey(message)
                 }
             }
         }
@@ -179,17 +212,27 @@ fun DisplayChatMessageFromBot(
 
 @Composable
 fun DisplayChatMessageFromUser(modifier: Modifier, message: ChatMessageFromUser) {
-    Column(Modifier.padding(16.dp).fillMaxWidth()) {
-        Row(modifier.padding(bottom = 2.dp, end = 16.dp).align(Alignment.End),
-            verticalAlignment = Alignment.CenterVertically) {
+    Column(
+        Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier
+                .padding(bottom = 2.dp, end = 16.dp)
+                .align(Alignment.End),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_surprise),
                 contentDescription = "Icon from assets"
             )
 
-            Text(text = "Livechat ${message.timeStamp.toTime()}",
+            Text(
+                text = "Livechat ${message.timeStamp.toTime()}",
                 modifier = modifier.padding(start = 16.dp),
-                fontSize = 10.sp)
+                fontSize = 10.sp
+            )
         }
 
         Box(Modifier.fillMaxWidth()) {
@@ -208,7 +251,9 @@ fun DisplayChatMessageFromUser(modifier: Modifier, message: ChatMessageFromUser)
                     .then(modifier)
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().align(Alignment.CenterEnd)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterEnd)
                         .background(color = Variables.ColorsAccentMain)
                 ) {
                     Text(
@@ -222,24 +267,29 @@ fun DisplayChatMessageFromUser(modifier: Modifier, message: ChatMessageFromUser)
     }
 }
 
-/*
-.border(width = 0.87387.dp, color = Color(0xFFE3E3E3), shape = RoundedCornerShape(size = 8.73872.dp)))
-.width(136.45036.dp)
-.height(51.46841.dp)
-.background(color = Variables.ColorsAccentDark, shape = RoundedCornerShape(size = 8.73872.dp))
-.padding(start = 19.22518.dp, top = 12.23421.dp, end = 19.22518.dp, bottom = 12.23421.dp)
-object Variables {
-val ColorsAccentDark: Color = Color(0xFF0050AA)
-}
-Row(
-horizontalArrangement = Arrangement.spacedBy(8.738719940185547.dp, Alignment.CenterHorizontally),
-verticalAlignment = Alignment.CenterVertically,
-) {
-// Child views.
-}
+@Composable
+fun Journey(message: ChatMessageFromBot) {
+    if (message.transportationLines.isNotEmpty()) {
+        Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
+            message.transportationLines.forEachIndexed { index, it ->
+                TransportationLineIcon(
+                    Modifier.size(40.dp),
+                    it,
+                    LineStatus.NONE
+                ) {
 
- */
+                }
 
+                if (index < message.transportationLines.size - 1) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_arrow_right),
+                        contentDescription = "Send"
+                    )
+                }
+            }
+        }
+    }
+}
 
 fun hideKeyboard(context: Context) {
     val inputMethodManager =
@@ -289,7 +339,10 @@ fun ChatMessageListPreview() {
             42,
             Date(),
             responseChunks = listOf("Hello", "How are you?"),
-            options = listOf("Good", "Bad")
+            options = listOf("Good", "Bad"),
+            transportationLines = listOf(
+                TransportationLine.METRO_4, TransportationLine.METRO_1
+            )
         ),
         ChatMessageFromUser(43, Date(), "Hello")
     )
