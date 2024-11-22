@@ -11,6 +11,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.idfm.hackathon.app.HackathonApp
 import com.idfm.hackathon.data.models.ChatMessage
+import com.idfm.hackathon.data.models.ChatMessageFromBot
+import com.idfm.hackathon.data.models.ChatMessageFromUser
 import com.idfm.hackathon.data.models.JsonResponse
 import com.idfm.hackathon.data.repositories.samplewebsocket.ReceivedType
 import com.idfm.hackathon.data.repositories.samplewebsocket.WebSocketState
@@ -20,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class ChatScreenViewModelImpl(
     private val _app: HackathonApp,
@@ -33,9 +36,11 @@ class ChatScreenViewModelImpl(
         putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fr-FR")
         putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
     }
+    private var uid = 1
 
     private var _chatMessages = listOf<ChatMessage>(
-        ChatMessage.FromBot(listOf("Hello, how can I help you?"), listOf())
+        ChatMessageFromBot(uid++, Date(), listOf("Hello, how can I help you?"), listOf()),
+        ChatMessageFromUser(uid++, Date(), "Je vais à la piscine")
     )
 
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Idle(_chatMessages))
@@ -64,7 +69,7 @@ class ChatScreenViewModelImpl(
         _sampleWebsocketRepo.sendText(request)
 
         val tmp = _chatMessages.map { it }.toMutableList()
-        tmp.add(ChatMessage.FromUser(request))
+        tmp.add(ChatMessageFromUser(uid++, Date(), request))
 
         _chatMessages = tmp.toList()
         _uiState.value = ChatUiState.Response(_chatMessages)
@@ -171,7 +176,9 @@ class ChatScreenViewModelImpl(
                         if (msg != null) {
                             val tmp = _chatMessages.map { it }.toMutableList()
                             tmp.add(
-                                ChatMessage.FromBot(
+                                ChatMessageFromBot(
+                                    uid++,
+                                    Date(),
                                     responseChunks = listOf(msg),
                                     options = listOf()
                                 )
