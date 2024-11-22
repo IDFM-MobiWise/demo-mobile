@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -287,23 +288,26 @@ fun DisplayChatMessageFromUser(modifier: Modifier, message: ChatMessageFromUser)
 @Composable
 fun Journey(message: ChatMessageFromBot) {
     if (message.transportationLines.isNotEmpty()) {
-        Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
-            message.transportationLines.forEachIndexed { index, it ->
-                TransportationLineIcon(
-                    Modifier.size(40.dp),
-                    it,
-                    LineStatus.NONE
-                ) {
+        Column() {
+            Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
+                message.transportationLines.forEachIndexed { index, it ->
+                    TransportationLineIcon(
+                        Modifier.size(40.dp),
+                        it,
+                        LineStatus.NONE
+                    ) {
 
-                }
+                    }
 
-                if (index < message.transportationLines.size - 1) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_arrow_right),
-                        contentDescription = "Send"
-                    )
+                    if (index < message.transportationLines.size - 1) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_arrow_right),
+                            contentDescription = "Send"
+                        )
+                    }
                 }
             }
+            JourneyHours(message.journeyFrom, message.journeyTo)
         }
     }
 }
@@ -312,6 +316,30 @@ fun hideKeyboard(context: Context) {
     val inputMethodManager =
         context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     inputMethodManager.hideSoftInputFromWindow((context as Activity).currentFocus?.windowToken, 0)
+}
+
+
+@Composable
+fun JourneyHours(from: String, to: String) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(from, modifier = Modifier.alpha(0.5f))
+        Image(
+            painter = painterResource(id = R.drawable.ic_journey_hours_from_to),
+            contentDescription = "",
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+        Text(to)
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+fun JourneyHoursPreview() {
+    JourneyHours("12:37", "14:33")
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -324,7 +352,9 @@ fun DisplayChatMessageFromBotPreview() {
             42,
             Date(),
             responseChunks = listOf("Hello", "How are you?"),
-            options = listOf("Good", "Bad")
+            options = listOf("Good", "Bad"),
+            journeyFrom = "",
+            journeyTo = "",
         ),
         onOptionSelected = {}
     )
@@ -363,7 +393,9 @@ fun ChatMessageListPreview() {
             options = listOf("Good", "Bad"),
             transportationLines = listOf(
                 TransportationLine.METRO_4, TransportationLine.METRO_1
-            )
+            ),
+            journeyFrom = "14:32",
+            journeyTo = "15:27"
         ),
         ChatMessageFromUser(43, Date(), "Hello")
     )

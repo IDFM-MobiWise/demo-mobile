@@ -24,7 +24,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class FakeResponse(val content: String, val transportations: List<TransportationLine> = listOf())
+class FakeResponse(
+    val content: String,
+    val transportations: List<TransportationLine> = listOf(),
+    val journeyFromDate: String = "",
+    val journeyToDate: String = ""
+)
 
 class ChatScreenViewModelImpl(
     private val _app: HackathonApp,
@@ -45,7 +50,7 @@ class ChatScreenViewModelImpl(
             uid++,
             Date(),
             listOf("Bonjour, comment puis-je t'aider aujourd'hui ?"),
-            listOf()
+            listOf(),
         ),
 //        ChatMessageFromUser(uid++, Date(), "Je vais à la piscine")
     )
@@ -185,7 +190,9 @@ class ChatScreenViewModelImpl(
                                 Date(),
                                 responseChunks = listOf(response.content),
                                 options = listOf(),
-                                transportationLines = response.transportations
+                                transportationLines = response.transportations,
+                                journeyFrom = response.journeyFromDate,
+                                journeyTo = response.journeyToDate
                             )
                         )
                         _chatMessages = tmp.toList()
