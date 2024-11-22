@@ -13,7 +13,7 @@ import com.idfm.hackathon.app.HackathonApp
 import com.idfm.hackathon.data.models.ChatMessage
 import com.idfm.hackathon.data.models.ChatMessageFromBot
 import com.idfm.hackathon.data.models.ChatMessageFromUser
-import com.idfm.hackathon.data.models.JsonResponse
+import com.idfm.hackathon.data.models.TransportationLine
 import com.idfm.hackathon.data.repositories.samplewebsocket.ReceivedType
 import com.idfm.hackathon.data.repositories.samplewebsocket.WebSocketState
 import com.idfm.hackathon.data.repositories.samplewebsocket.WebsocketRepository
@@ -23,6 +23,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
+
+class FakeResponse(val content: String, val transportations: List<TransportationLine> = listOf())
 
 class ChatScreenViewModelImpl(
     private val _app: HackathonApp,
@@ -39,8 +41,13 @@ class ChatScreenViewModelImpl(
     private var uid = 1
 
     private var _chatMessages = listOf<ChatMessage>(
-        ChatMessageFromBot(uid++, Date(), listOf("Hello, how can I help you?"), listOf()),
-        ChatMessageFromUser(uid++, Date(), "Je vais à la piscine")
+        ChatMessageFromBot(
+            uid++,
+            Date(),
+            listOf("Bonjour, comment puis-je t'aider aujourd'hui ?"),
+            listOf()
+        ),
+//        ChatMessageFromUser(uid++, Date(), "Je vais à la piscine")
     )
 
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Idle(_chatMessages))
@@ -161,32 +168,48 @@ class ChatScreenViewModelImpl(
                     "HomeScreenViewModelImpl",
                     "Websocket message: ${webSocketState.receivedType}"
                 )
+
                 if (webSocketState.receivedType is ReceivedType.Text) {
                     val txt = webSocketState.receivedType.text
 
                     // Now, deserialize.
                     val gson = Gson()
-                    val responseType = object : TypeToken<JsonResponse>() {}.type
-                    val response = gson.fromJson<JsonResponse>(txt, responseType)
+                    val responseType = object : TypeToken<FakeResponse>() {}.type
+                    val response = gson.fromJson<FakeResponse>(txt, responseType)
 
-                    if (response.node == "respond") {
-                        val msg =
-                            response.values.messages.getOrNull(0)?.kwargs?.lc_kwargs?.lc_kwargs?.content
-
-                        if (msg != null) {
-                            val tmp = _chatMessages.map { it }.toMutableList()
-                            tmp.add(
-                                ChatMessageFromBot(
-                                    uid++,
-                                    Date(),
-                                    responseChunks = listOf(msg),
-                                    options = listOf()
-                                )
+                    if (response != null) {
+                        val tmp = _chatMessages.map { it }.toMutableList()
+                        tmp.add(
+                            ChatMessageFromBot(
+                                uid++,
+                                Date(),
+                                responseChunks = listOf(response.content),
+                                options = listOf(),
+                                transportationLines = response.transportations
                             )
-                            _chatMessages = tmp.toList()
-                            _uiState.value = ChatUiState.Response(_chatMessages)
-                        }
+                        )
+                        _chatMessages = tmp.toList()
+                        _uiState.value = ChatUiState.Response(_chatMessages)
                     }
+
+//                    if (response.node == "respond") {
+//                        val msg =
+//                            response.values.messages.getOrNull(0)?.kwargs?.lc_kwargs?.lc_kwargs?.content
+//
+//                        if (msg != null) {
+//                            val tmp = _chatMessages.map { it }.toMutableList()
+//                            tmp.add(
+//                                ChatMessageFromBot(
+//                                    uid++,
+//                                    Date(),
+//                                    responseChunks = listOf(msg),
+//                                    options = listOf()
+//                                )
+//                            )
+//                            _chatMessages = tmp.toList()
+//                            _uiState.value = ChatUiState.Response(_chatMessages)
+//                        }
+//                    }
                 }
             }
 

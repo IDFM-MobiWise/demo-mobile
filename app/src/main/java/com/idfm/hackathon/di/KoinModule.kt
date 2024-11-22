@@ -4,6 +4,7 @@ import com.idfm.hackathon.app.HackathonApp
 import com.idfm.hackathon.data.repositories.sample.SampleRepository
 import com.idfm.hackathon.data.repositories.sample.SampleRepositoryImpl
 import com.idfm.hackathon.data.repositories.sample.SampleRetrofitClient
+import com.idfm.hackathon.data.repositories.samplewebsocket.FakeWebsocketRepoImpl
 import com.idfm.hackathon.data.repositories.samplewebsocket.SampleWebsocketRepoImpl
 import com.idfm.hackathon.data.repositories.samplewebsocket.WebsocketRepository
 import com.idfm.hackathon.ui.features.chat.ChatScreenViewModelImpl
@@ -29,6 +30,7 @@ val diModules = module {
     } bind SampleRepository::class
 
     factory {
-        SampleWebsocketRepoImpl()
+//        SampleWebsocketRepoImpl()
+        FakeWebsocketRepoImpl()
     } bind WebsocketRepository::class
 }

@@ -53,5 +53,6 @@ class ChatMessageFromBot(
     id: Int,
     timeStamp: Date,
     val responseChunks: List<String>,
-    val options: List<String>
+    val options: List<String>,
+    val transportationLines: List<TransportationLine> = listOf()
 ) : ChatMessage(id, timeStamp)
