@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -70,15 +69,24 @@ fun ChatScreen(
     vm: ChatScreenViewModel
 ) {
     val chatState by vm.uiState().collectAsState()
+    var sttResults by remember {
+        mutableStateOf<ChatUiState.ResultStt?>(null)
+    }
+
+    if (chatState is ChatUiState.ResultStt) {
+        sttResults = chatState as ChatUiState.ResultStt
+    }
 
     Column(Modifier.fillMaxSize()) {
         ChatMessageList(Modifier.weight(1.0f), chatState.messages)
 
-        UserInput(onSend = {
-            vm.postUSerRequest(it)
-        }, onStt = {
-            vm.startStt()
-        })
+        UserInput(sttResults,
+            onSend = {
+                sttResults = null
+                vm.postUSerRequest(it)
+            }, onStt = {
+                vm.startStt()
+            })
     }
 }
 
@@ -113,18 +121,29 @@ fun ChatMessageList(modifier: Modifier, messages: List<ChatMessage>) {
 }
 
 @Composable
-fun UserInput(onSend: (String) -> Unit = {}, onStt: () -> Unit) {
+fun UserInput(
+    sttResults: ChatUiState.ResultStt?,
+    onSend: (String) -> Unit = {},
+    onStt: () -> Unit
+) {
     val context = LocalContext.current
+
+    var input by remember { mutableStateOf("") }
+
+    sttResults?.textList?.getOrNull(0)?.let {
+        input = it
+    }
+
     Row(Modifier.fillMaxWidth()) {
-        var userInput by remember { mutableStateOf("") }
-        TextField(value = userInput, onValueChange = {
-            userInput = it
+        TextField(value = input, onValueChange = {
+            input = it
         }, modifier = Modifier.weight(1.0f))
 
         Button(onClick = {
             hideKeyboard(context)
-            onSend(userInput)
-        }, enabled = userInput.isNotBlank()) {
+            onSend(input)
+            input = ""
+        }, enabled = input.isNotBlank()) {
             Icon(
                 imageVector = Icons.Default.Send,
                 contentDescription = "Send"
@@ -133,7 +152,7 @@ fun UserInput(onSend: (String) -> Unit = {}, onStt: () -> Unit) {
 
         Button(onClick = {
             onStt()
-        }, enabled = userInput.isNotBlank()) {
+        }) {
             Image(
                 painter = painterResource(id = R.drawable.ic_mic_on_active),
                 contentDescription = "Stt"
@@ -238,10 +257,8 @@ fun DisplayChatMessageFromUser(modifier: Modifier, message: ChatMessageFromUser)
         Box(Modifier.fillMaxWidth()) {
             Box(
                 Modifier
-                    .width(120.dp)
                     .padding(16.dp)
                     .align(alignment = Alignment.CenterEnd)
-
                     .clip(RoundedCornerShape(Variables.cornerRadius))
                     .border(
                         width = 1.dp,
@@ -319,7 +336,11 @@ fun DisplayChatMessageFromBotPreview() {
 fun DisplayChatMessageFromUserPreview() {
     DisplayChatMessageFromUser(
         modifier = Modifier,
-        message = ChatMessageFromUser(42, Date(), "Hello")
+        message = ChatMessageFromUser(
+            42,
+            Date(),
+            "Hello, can you tell me if my journey is going to be ok?"
+        )
     )
 }
 
@@ -327,7 +348,7 @@ fun DisplayChatMessageFromUserPreview() {
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 fun UserInputPreview() {
-    UserInput() {}
+    UserInput(null) {}
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
