@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +26,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -60,6 +63,7 @@ import java.util.Date
 
 object Variables {
     val ColorsAccentMain: Color = Color(0xFF1976D3)
+    val ColorsAccentOther: Color = Color(0xFF0050AA)
     val cornerRadius = 8.dp
 }
 
@@ -136,24 +140,33 @@ fun UserInput(
     }
 
     Row(Modifier.fillMaxWidth()) {
-        TextField(value = input, onValueChange = {
-            input = it
-        }, modifier = Modifier.weight(1.0f))
+        TextField(
+            value = input, onValueChange = {
+                input = it
+            }, modifier = Modifier
+                .weight(1.0f)
+                .padding(end = 2.dp)
+        )
 
-        Button(onClick = {
-            hideKeyboard(context)
-            onSend(input)
-            input = ""
-        }, enabled = input.isNotBlank()) {
+        Button(
+            onClick = {
+                hideKeyboard(context)
+                onSend(input)
+                input = ""
+            }, modifier = Modifier.padding(end = 2.dp),
+
+            enabled = input.isNotBlank()
+        ) {
             Icon(
                 imageVector = Icons.Default.Send,
                 contentDescription = "Send"
             )
         }
 
-        Button(onClick = {
-            onStt()
-        }) {
+        Button(modifier = Modifier.padding(end = 2.dp),
+            onClick = {
+                onStt()
+            }) {
             Image(
                 painter = painterResource(id = R.drawable.ic_mic_on_active),
                 contentDescription = "Stt"
@@ -181,8 +194,8 @@ fun DisplayChatMessageFromBot(
             )
 
             Text(
-                text = "Livechat ${message.timeStamp.toTime()}",
-                modifier = modifier.padding(start = 16.dp),
+                text = "IDFM Copilote ${message.timeStamp.toTime()}",
+                modifier = modifier.padding(start = 8.dp),
                 fontSize = 10.sp
             )
         }
@@ -223,7 +236,16 @@ fun DisplayChatMessageFromBot(
                         }
                     }
 
-                    Journey(message)
+                    Card(
+                        shape = RoundedCornerShape(8.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .fillMaxWidth(),
+                    ) {
+                        Journey(message)
+                    }
                 }
             }
         }
@@ -249,8 +271,8 @@ fun DisplayChatMessageFromUser(modifier: Modifier, message: ChatMessageFromUser)
             )
 
             Text(
-                text = "Livechat ${message.timeStamp.toTime()}",
-                modifier = modifier.padding(start = 16.dp),
+                text = "Moi ${message.timeStamp.toTime()}",
+                modifier = modifier.padding(start = 8.dp),
                 fontSize = 10.sp
             )
         }
@@ -288,26 +310,33 @@ fun DisplayChatMessageFromUser(modifier: Modifier, message: ChatMessageFromUser)
 @Composable
 fun Journey(message: ChatMessageFromBot) {
     if (message.transportationLines.isNotEmpty()) {
-        Column() {
-            Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
-                message.transportationLines.forEachIndexed { index, it ->
-                    TransportationLineIcon(
-                        Modifier.size(40.dp),
-                        it,
-                        LineStatus.NONE
-                    ) {
 
-                    }
+        Row(modifier = Modifier.padding(8.dp)) {
+            Column(Modifier.weight(1.0f)) {
+                Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
+                    message.transportationLines.forEachIndexed { index, it ->
+                        TransportationLineIcon(
+                            Modifier.size(40.dp),
+                            it,
+                            LineStatus.NONE
+                        ) {
 
-                    if (index < message.transportationLines.size - 1) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_arrow_right),
-                            contentDescription = "Send"
-                        )
+                        }
+
+                        if (index < message.transportationLines.size - 1) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_arrow_right),
+                                contentDescription = "Send"
+                            )
+                        }
                     }
                 }
+                JourneyHours(message.journeyFrom, message.journeyTo)
             }
-            JourneyHours(message.journeyFrom, message.journeyTo)
+
+            AdditionalJourneyDetails(Modifier.padding(end = 8.dp).fillMaxHeight(),
+                message.remainingTime,
+                message.co2)
         }
     }
 }
@@ -325,14 +354,43 @@ fun JourneyHours(from: String, to: String) {
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(from, modifier = Modifier.alpha(0.5f))
+        Text(from, modifier = Modifier.alpha(0.5f), color = Color.Black)
         Image(
             painter = painterResource(id = R.drawable.ic_journey_hours_from_to),
             contentDescription = "",
             modifier = Modifier.padding(horizontal = 8.dp)
         )
-        Text(to)
+        Text(to, color = Color.Black)
     }
+}
+
+@Composable
+fun AdditionalJourneyDetails(modifier: Modifier, remaining: String, co2: String) {
+    Column(horizontalAlignment = Alignment.End, modifier = Modifier.then(modifier)) {
+        Box(Modifier.clip(RoundedCornerShape(Variables.cornerRadius))) {
+            Text(text = "2.35€",
+                color = Color.White,
+                modifier = Modifier.background(Variables.ColorsAccentOther)
+                    .padding(top = 4.dp, bottom = 4.dp, start = 6.dp, end = 6.dp))
+        }
+        Text(text = remaining,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            fontSize = 16.sp,
+            color = Color.Black)
+
+        Text(text = co2,
+            modifier= Modifier.alpha(0.5f),
+            fontSize = 16.sp,
+            color = Color.Black)
+
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+fun AdditionalJourneyDetailsPreview() {
+    AdditionalJourneyDetails(Modifier, "17 min", "15 gr (CO2)")
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)

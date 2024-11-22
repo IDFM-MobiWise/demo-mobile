@@ -28,7 +28,9 @@ class FakeResponse(
     val content: String,
     val transportations: List<TransportationLine> = listOf(),
     val journeyFromDate: String = "",
-    val journeyToDate: String = ""
+    val journeyToDate: String = "",
+    val remainingTime: String = "",
+    val co2: String = ""
 )
 
 class ChatScreenViewModelImpl(
@@ -192,7 +194,9 @@ class ChatScreenViewModelImpl(
                                 options = listOf(),
                                 transportationLines = response.transportations,
                                 journeyFrom = response.journeyFromDate,
-                                journeyTo = response.journeyToDate
+                                journeyTo = response.journeyToDate,
+                                remainingTime = response.remainingTime,
+                                co2 = response.co2
                             )
                         )
                         _chatMessages = tmp.toList()

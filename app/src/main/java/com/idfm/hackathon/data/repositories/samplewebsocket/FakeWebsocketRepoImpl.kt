@@ -28,7 +28,10 @@ class FakeWebsocketRepoImpl() : WebsocketRepository {
                                 "il faut partir de la Montparnasse à 16:28. Le traffic est actuellement fluide, et la l'affluence habituelle. ",
                         listOf(TransportationLine.METRO_4, TransportationLine.METRO_14),
                         journeyFromDate = "16:28",
-                        journeyToDate = "16:44"
+                        journeyToDate = "16:44",
+                        remainingTime = "16 min",
+                        co2 = "15 gr (CO2)"
+
                     ).let {
                         Gson().toJson(it)
                     }
@@ -37,10 +40,12 @@ class FakeWebsocketRepoImpl() : WebsocketRepository {
                 WebSocketState.OnMessage(ReceivedType.Text(
                     FakeResponse(
                         content = "Un incident est survenu sur la ligne 14, je te propose la meilleure " +
-                                "alternative, et de changer à Châtelet pour prendre la ligne 1, direction Château de Vincennes. Pas d'inquiétude, tu auras toujours 15 minutes d'avance pour ton TGV",
+                                "alternative, et de changer à Châtelet pour prendre la ligne 1, direction Château de Vincennes. Pas d'inquiétude, tu auras toujours 15 minutes d'avance pour ton TGV.",
                         listOf(TransportationLine.METRO_4, TransportationLine.METRO_1),
                         journeyFromDate = "16:37",
-                        journeyToDate = "16:49"
+                        journeyToDate = "16:49",
+                        remainingTime = "12 min",
+                        co2 = "8 gr (CO2)"
                     ).let {
                         Gson().toJson(it)
                     }
